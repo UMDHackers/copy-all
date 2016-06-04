@@ -40,7 +40,7 @@ def details(argv):
 	elif(len(cmds) == 4):
 		cmd_1 = cmds[2]
 		cmd_2 = cmds[3]
-		if(!cmd_1.endswith("-b") or !cmd_1.endswith("-e")):
+		if(not (cmd_1.endswith("-b") or cmd_1.endswith("-e"))):
 			for path, dirs, files in os.walk(cmds[1])::
 				for file in files:
 					if file.endswith(cmd_1):
