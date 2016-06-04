@@ -17,6 +17,8 @@ def details(argv):
 		cmd_1 = cmds[2]
 		cmd_2 = cmds[3]
 		cmd_3 = cmds[4]
+		cmd_2 = cmd_2.replace("-b","")
+		cmd_3 = cmd_3.replace("-e", "")
 		s_time = cmd_2.split("/")
 		e_time = cmd_3.split("/")
 		s_month = s_time[0]
@@ -31,23 +33,95 @@ def details(argv):
 		e_sec = (e_sec - datetime.datetime(1970, 1, 1)).total_seconds()
 		for path, dirs, files in os.walk(cmds[1])::
 			for file in files:
-				if file.endswith(type) and 
+				if file.endswith(cmd_1) and 
 				time.ctime(os.path.getmtime(path+os.sep+file)) >= s_sec and 
 				time.ctime(os.path.getmtime(path+os.sep+file)) <= e_sec:
-					ret.append(path+os.sep+file)
-			
-					
+					ret.add(path+os.sep+file)
 	elif(len(cmds) == 4):
 		cmd_1 = cmds[2]
 		cmd_2 = cmds[3]
+		if(!cmd_1.endswith("-b") or !cmd_1.endswith("-e")):
+			for path, dirs, files in os.walk(cmds[1])::
+				for file in files:
+					if file.endswith(cmd_1):
+						ret.add(path+os.sep+file)
+		elif(cmd_1.endswith("-b")):
+			cmd_1 = cmd_1.replace("-b","")
+			s_time = cmd_1.split("/")
+			s_month = s_time[0]
+			s_day = s_time[1]
+			s_year = s_time[2]
+			s_sec = datetime.datetime(s_year, s_month, s_day, 0, 0)
+			s_sec = (s_sec - datetime.datetime(1970, 1, 1)).total_seconds()
+			for path, dirs, files in os.walk(cmds[1])::
+				for file in files:
+					if time.ctime(os.path.getmtime(path+os.sep+file)) >= s_sec:
+						ret.add(path+os.sep+file)
+		else:
+			help()
+		
+		if(cmd_2.endswith("-b")):
+			tmp = []
+			cmd_2 = cmd_2.replace("-b","")
+			s_time = cmd_2.split("/")
+			s_month = s_time[0]
+			s_day = s_time[1]
+			s_year = s_time[2]
+			s_sec = datetime.datetime(s_year, s_month, s_day, 0, 0)
+			s_sec = (s_sec - datetime.datetime(1970, 1, 1)).total_seconds()
+			for file in ret:
+				if time.ctime(os.path.getmtime(file)) >= s_sec:
+					tmp.add(file)
+			ret = tmp
+		elif(cmd_2.endswith("-e")):
+			tmp = []
+			cmd_2 = cmd_2.replace("-e","")
+			e_time = cmd_2.split("/")
+			e_month = e_time[0]
+			e_day = e_time[1]
+			e_year = e_time[2]
+			e_sec = datetime.datetime(e_year, e_month, e_day, 0, 0)
+			e_sec = (e_sec - datetime.datetime(1970, 1, 1)).total_seconds()
+			for file in ret:
+				if time.ctime(os.path.getmtime(file)) <= s_sec:
+					tmp.add(file)
+			ret = tmp
+		else:
+			help()
 	elif(len(cmds) == 3):
 		cmd_1 = cmds[2]
-	#type
-	#see if there 
-	
-	#date begins
-
-	#date ends
+		if(cmd_1.endswith("-e")):
+			cmd_1 = cmd_1.replace("-b","")
+			s_time = cmd_1.split("/")
+			s_month = s_time[0]
+			s_day = s_time[1]
+			s_year = s_time[2]
+			s_sec = datetime.datetime(s_year, s_month, s_day, 0, 0)
+			s_sec = (s_sec - datetime.datetime(1970, 1, 1)).total_seconds()
+			for path, dirs, files in os.walk(cmds[1])::
+				for file in files:
+					if time.ctime(os.path.getmtime(path+os.sep+file)) >= s_sec:
+						ret.add(path+os.sep+file)
+		elif(cmd_1.endswith("-b")):
+			cmd_1 = cmd_1.replace("-e","")
+			e_time = cmd_1.split("/")
+			e_month = e_time[0]
+			e_day = e_time[1]
+			e_year = e_time[2]
+			e_sec = datetime.datetime(e_year, e_month, e_day, 0, 0)
+			e_sec = (e_sec - datetime.datetime(1970, 1, 1)).total_seconds()
+			for path, dirs, files in os.walk(cmds[1])::
+				for file in files:
+					if time.ctime(os.path.getmtime(path+os.sep+file)) <= e_sec:
+						ret.add(path+os.sep+file)
+		else:
+			for path, dirs, files in os.walk(cmds[1]):
+				for file in files:
+					if file.endswith(cmd_1):
+						ret.add(path+os.sep+file)
+	for file in ret:
+		
+		
 #first one
 def main(argv):
 	config = open("config.txt", "r")	
@@ -62,30 +136,27 @@ def main(argv):
 		#Move the file to the USB!
 		if(os.path.isfile(file)):
 			file_name = ntpath.basename(file)
-			shutil.copyfile(file, "D:/"+file_name)
+			shutil.copyfile(file, output+file_name)
 		elif(os.path.isdir(file)):
 			#type of file
 			if(len(argv) > 2):
 				details(argv)
 			else:
 				dir = ntpath.basename(file)
-				shutil.copytree(file, "D:/"+dir)
+				shutil.copytree(file, output+dir)
 		elif(file == "all"):
 			if(len(argv) > 2):
 				details(argv)
 			else:
 				dir_collection = []
-				for path, dirs, files in os.walk('C:/'):
+				for path, dirs, files in os.walk(main_dir):
 					# go only one level deep
 					dir_collection = list(dirs)
 					del dirs[:] # go only one level deep
-					
 				for d in dir_collection:
-					print d
-				
+					shutil.copytree(d, output+d)
 				for f in files:
-					print f
-			
+					shutil.copyfile(f, output+f)
 #main
 if __name__ == '__main__':
     main(sys.argv)
