@@ -83,7 +83,7 @@ def details(argv):
 		
 		ret.intersection(temp_ret)
 	
-	if !force:
+	if not force:
 		for file in ret:
 			shutil.copyfile(file, output+file)
 	else:
