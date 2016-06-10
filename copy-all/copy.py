@@ -18,14 +18,30 @@ def details(argv):
 	cmds = argv.split(" ")
 	spe_dir = cmds[1]
 	force = False
+	que = Queue()
+	
+	#Get all the files from every directory
+	for path, dirs, files in os.walk(spe_dir):
+		file in files:
+			ret.add(path+os.sep+file)
+		dir in dirs:
+			que.add(path+os.sep+dir)
+	
+	while not que.empty():
+		tmp = que.get
+		for path, dirs, files in os.walk(spe_dir):
+			file in files:
+				ret.add(path+os.sep+file)
+			dir in dirs:
+				que.add(path+os.sep+dir)
+	
 	for i in range(2, len(cmds)):
 		curr_cmd = cmds[i]
 		if curr_cmd.endswith("-t"):
 			curr_cmd.replace("-t","")
-			for path, dirs, files in os.walk(spe_dir):
-				for file in files:
-					if file.endswith(cmd_1):
-						temp_ret.add(path+os.sep+file)
+			for file in ret:
+				if file.endswith("."+curr_cmd):
+					temp_ret.add(file)
 		elif curr_cmd.endswith("-b"):
 			curr_cmd.replace("-b", "")
 			s_time = curr_cmd.split("/")
@@ -34,10 +50,9 @@ def details(argv):
 			s_year = s_time[2]
 			s_sec = datetime.datetime(s_year, s_month, s_day, 0, 0)
 			s_sec = (s_sec - datetime.datetime(1970, 1, 1)).total_seconds()
-			for path, dirs, files in os.walk(spe_dir)::
-				for file in files:
-					if time.ctime(os.path.getmtime(path+os.sep+file)) >= s_sec
-						temp_ret.add(path+os.sep+file)
+			for file in ret:
+				if time.ctime(os.path.getmtime(file)) >= s_sec
+					temp_ret.add(file)
 		elif curr_cmd.endswith("-e"):
 			curr_cmd.replace("-e", "")
 			e_time = curr_cmd.split("/")
@@ -46,44 +61,43 @@ def details(argv):
 			e_year = e_time[2]
 			e_sec = datetime.datetime(e_year, e_month, e_day, 0, 0)
 			e_sec = (e_sec - datetime.datetime(1970, 1, 1)).total_seconds()
-			for path, dirs, files in os.walk(spe_dir)::
-				for file in files:
-					if time.ctime(os.path.getmtime(path+os.sep+file)) <= e_sec
-						temp_ret.add(path+os.sep+file)
+			for file in ret:
+				if time.ctime(os.path.getmtime(file)) <= e_sec
+					temp_ret.add(file)
 		elif curr_cmd.endswith("-s"):
 			curr_cmd.replace("-s","")
-			for path, dirs, files in os.walk(spe_dir):
-				for file in files:
-					if os.path.getSize(path+os.sep+file) >= int(curr_cmd):
-						temp_ret.add(path+os.sep+file)
+			for file in ret:
+				if os.path.getSize(file) >= int(curr_cmd):
+					temp_ret.add(file)
 		elif curr_cmd.endswith("-l"):
 			curr_cmd.replace("-l", "")
-			for path, dirs, files in os.walk(spe_dir):
-				for file in files:
-					if os.path.getSize(path+os.sep+file) <= int(curr_cmd):
-						temp_ret.add(path+os.sep+file)
+			for file in ret:
+				if os.path.getSize(file) <= int(curr_cmd):
+					temp_ret.add(file)
 					
 		elif curr_cmd.endswith("-strict"):
 			curr_cmd.replace("-strict", "")
 			for path, dirs, files in os.walk(spe_dir):
-				for file in files:
+				for file in ret:
 					if file == curr_cmd:
-						temp_ret.add(path+os.sep+file)
+						temp_ret.add(file)
 						
 		elif curr_cmd.endswith("-leninent"):
 			curr_cmd.replace("-leninent", "")
-			for path, dirs, files in os.walk(spe_dir):
-				for file in files:
-					if curr_cmd in file:
-						temp_ret.add(path+os.sep+file)
+			for file in ret:
+				if curr_cmd in file:
+					temp_ret.add(file)
+		
+		elif curr_cmd == "force":
+			force = True
 		
 		else:
 			print "failed, please check your command you typed in"
 			return	
 		
-		ret.intersection(temp_ret)
+		ret = temp_ret
 	
-	if not force:
+	if !force:
 		for file in ret:
 			shutil.copyfile(file, output+file)
 	else:
