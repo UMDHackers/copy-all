@@ -97,7 +97,7 @@ def details(argv):
 		
 		ret = temp_ret
 	
-	if !force:
+	if not force:
 		for file in ret:
 			shutil.copyfile(file, output+file)
 	else:
