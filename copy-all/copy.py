@@ -12,27 +12,29 @@ def help():
 	print "Size is the same idea, have a size of bytes you wanna be over [size]-s or if you want to be under [size]-l or both"
 	print "name, name of the file -strict meaning the exact file name has to be allowed or -leninent meaning if the string is in the file name"
 	print "force, will remove the orginal copy of the file"
+	
 def details(argv):
-	ret = set(), temp_ret = set()
+	ret = [], temp_ret = []
 	curr_cmd = ""
 	cmds = argv.split(" ")
 	spe_dir = cmds[1]
 	force = False
 	que = Queue()
 	
-	#Get all the files from every directory
+	#Get all the files from first level
 	for path, dirs, files in os.walk(spe_dir):
-		file in files:
+		for file in files:
 			ret.add(path+os.sep+file)
-		dir in dirs:
+		for dir in dirs:
 			que.add(path+os.sep+dir)
-	
+
+	#Get the files from the rest of the folders
 	while not que.empty():
-		tmp = que.get
-		for path, dirs, files in os.walk(spe_dir):
-			file in files:
+		tmp = que.pop
+		for path, dirs, files in os.walk(tmp):
+			for file in files:
 				ret.add(path+os.sep+file)
-			dir in dirs:
+			for dir in dirs:
 				que.add(path+os.sep+dir)
 	
 	for i in range(2, len(cmds)):
@@ -51,7 +53,7 @@ def details(argv):
 			s_sec = datetime.datetime(s_year, s_month, s_day, 0, 0)
 			s_sec = (s_sec - datetime.datetime(1970, 1, 1)).total_seconds()
 			for file in ret:
-				if time.ctime(os.path.getmtime(file)) >= s_sec
+				if time.ctime(os.path.getmtime(file)) >= s_sec:
 					temp_ret.add(file)
 		elif curr_cmd.endswith("-e"):
 			curr_cmd.replace("-e", "")
@@ -62,7 +64,7 @@ def details(argv):
 			e_sec = datetime.datetime(e_year, e_month, e_day, 0, 0)
 			e_sec = (e_sec - datetime.datetime(1970, 1, 1)).total_seconds()
 			for file in ret:
-				if time.ctime(os.path.getmtime(file)) <= e_sec
+				if time.ctime(os.path.getmtime(file)) <= e_sec:
 					temp_ret.add(file)
 		elif curr_cmd.endswith("-s"):
 			curr_cmd.replace("-s","")
